@@ -40,7 +40,7 @@ void some_random_computation() {
   // calculate the sum from 1 to 10000
   // std::cout << "doing random computation" << std::endl;
   long long int sum = 0;
-  for (long long int i = 1000; i >= 0; i--) {
+  for (long long int i = 10000; i >= 0; i--) {
     sum = sum + i;
   }
 }
@@ -50,21 +50,21 @@ void *periodic_task(void *threadinput) {
   struct timespec start_time, before_sleep_time, after_sleep_time;
 
   // create a file to store the execution time
-  FILE *file = fopen("data//execution_time2.txt", "a");
+  FILE *file = fopen("data//execution_time1.txt", "a");
   if (file == NULL) {
     perror("Error opening file");
     exit(EXIT_FAILURE);
   }
 
   // creat a file to store the idle time
-  FILE *file2 = fopen("data//idle_time2.txt", "a");
+  FILE *file2 = fopen("data//idle_time1.txt", "a");
   if (file == NULL) {
     perror("Error opening file");
     exit(EXIT_FAILURE);
   }
 
   // creat a file to store the idle time
-  FILE *file3 = fopen("data//sample_time2.txt", "a");
+  FILE *file3 = fopen("data//sample_time1.txt", "a");
   if (file == NULL) {
     perror("Error opening file");
     exit(EXIT_FAILURE);
@@ -72,14 +72,14 @@ void *periodic_task(void *threadinput) {
 
   // array to store timing information, this is to avoid writing to file inside
   // the loop as per the assignment instruction
-  long long int execution_time[100];
-  long long int idle_time[100];
-  long long int sample_time[100];
+  long long int execution_time[1000];
+  long long int idle_time[1000];
+  long long int sample_time[1000];
 
   // start the timer
   sigset_t signalset = start_periodic_timer();
 
-  for (int index = 0; index < 100; index++) {
+  for (int index = 0; index < 1000; index++) {
 
     // get time before the math operation starts
     clock_gettime(CLOCK_MONOTONIC, &start_time);

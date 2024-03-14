@@ -9,7 +9,7 @@ using namespace std;
 void some_random_computation() {
   // calculate the sum from 1 to 10000
   long long sum = 0;
-  for (long long i = 100000; i >= 0; i--) {
+  for (long long i = 10000; i >= 0; i--) {
     sum = sum + i;
   }
 }
@@ -23,21 +23,21 @@ void *periodic_task(void *threadinput) {
   interval.tv_nsec = INTERVAL_NS;
 
   // create a file to store the execution time (time taken by the math stuff)
-  FILE *file = fopen("data2//execution_time2.txt", "a");
+  FILE *file = fopen("data2//execution_time1.txt", "a");
   if (file == NULL) {
     perror("Error opening file");
     exit(EXIT_FAILURE);
   }
 
   // creat a file to store the idle time (time the process sleeps)
-  FILE *file2 = fopen("data2//idle_time2.txt", "a");
+  FILE *file2 = fopen("data2//idle_time1.txt", "a");
   if (file == NULL) {
     perror("Error opening file");
     exit(EXIT_FAILURE);
   }
 
   // create a file to store the sample time (time between conscutive loops)
-  FILE *file3 = fopen("data2//sample_time2.txt", "a");
+  FILE *file3 = fopen("data2//sample_time1.txt", "a");
   if (file == NULL) {
     perror("Error opening file");
     exit(EXIT_FAILURE);
@@ -45,11 +45,11 @@ void *periodic_task(void *threadinput) {
 
   // array to store timing information, this is to avoid writing to file inside
   // the loop as per the assignment instruction
-  long long int execution_time[100];
-  long long int idle_time[100];
-  long long int sample_time[100];
+  long long int execution_time[1000];
+  long long int idle_time[1000];
+  long long int sample_time[1000];
 
-  for (int i = 0; i < 100; i++) {
+  for (int i = 0; i < 1000; i++) {
     // record the current time at the beginning of each iteration
     clock_gettime(CLOCK_MONOTONIC, &currentStartTime);
 
@@ -69,6 +69,8 @@ void *periodic_task(void *threadinput) {
 
     } else {
       isFirstIteration = false;
+      nextTime = currentStartTime; // initialize it with current time. it is
+                                   // updated downstairs
     }
 
     // save the start of current iteration to use it as last start in next
