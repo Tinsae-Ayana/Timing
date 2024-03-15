@@ -1,3 +1,6 @@
+#include <evl/clock.h>
+#include <evl/thread.h>
+#include <evl/timer.h>
 #include <iostream>
 #include <pthread.h>
 #include <time.h>
@@ -15,6 +18,10 @@ void some_random_computation() {
 
 void *periodic_task(void *threadinput) {
 
+  /* Attach the current thread to the EVL core. */
+  int efd;
+  efd = evl_attach_self("/real_time-%d", getpid());
+
   struct timespec currentStartTime, nextTime, lastStartTime, timeBeforeSleep,
       interval;
   bool isFirstIteration = true;
@@ -22,21 +29,21 @@ void *periodic_task(void *threadinput) {
   interval.tv_nsec = INTERVAL_NS;
 
   // create a file to store the execution time (time taken by the math stuff)
-  FILE *file = fopen("data2//execution_time2.txt", "a");
+  FILE *file = fopen("data3//execution_time.txt", "a");
   if (file == NULL) {
     perror("Error opening file");
     exit(EXIT_FAILURE);
   }
 
   // creat a file to store the idle time (time the process sleeps)
-  FILE *file2 = fopen("data2//idle_time2.txt", "a");
+  FILE *file2 = fopen("data3//idle_time.txt", "a");
   if (file == NULL) {
     perror("Error opening file");
     exit(EXIT_FAILURE);
   }
 
   // create a file to store the sample time (time between conscutive loops)
-  FILE *file3 = fopen("data2//sample_time2.txt", "a");
+  FILE *file3 = fopen("data3//sample_time.txt", "a");
   if (file == NULL) {
     perror("Error opening file");
     exit(EXIT_FAILURE);
@@ -50,7 +57,7 @@ void *periodic_task(void *threadinput) {
 
   for (int i = 0; i < 1000; i++) {
     // record the current time at the beginning of each iteration
-    clock_gettime(CLOCK_MONOTONIC, &currentStartTime);
+    evl_read_clock(EVL_CLOCK_MONOTONIC, &currentStartTime);
 
     if (!isFirstIteration) {
       // calculate the time interval from the start of previous iteration to
@@ -84,16 +91,16 @@ void *periodic_task(void *threadinput) {
     some_random_computation();
 
     // get absolute time before sleep
-    clock_gettime(CLOCK_MONOTONIC, &timeBeforeSleep);
+    evl_read_clock(EVL_CLOCK_MONOTONIC, &timeBeforeSleep);
 
-    // calculate and store the time taken by math computation to be executed
+    // calculate and store the time taken by math computation
     long long execution_time_ns =
         (timeBeforeSleep.tv_sec - currentStartTime.tv_sec) * 1000000000 +
         (timeBeforeSleep.tv_nsec - currentStartTime.tv_nsec);
     execution_time[i] = execution_time_ns;
 
     // sleep the remaining idle time
-    clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &nextTime, NULL);
+    evl_sleep_until(EVL_CLOCK_MONOTONIC, &nextTime);
   }
 
   // save the data to file
@@ -113,6 +120,9 @@ void *periodic_task(void *threadinput) {
   fclose(file);
   fclose(file2);
   fclose(file3);
+
+  // detach the thread from evlcore
+  evl_detach_thread();
 
   return NULL;
 }

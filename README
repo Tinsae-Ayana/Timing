@@ -1,4 +1,4 @@
-* ssh -x asdfr_cbl_08@
+* ssh -x asdfr_cbl_08@10.0.15.55
 * password advanced_decision
 * run clone command
 * run "g++ signal_nwait.cpp -o signal"
